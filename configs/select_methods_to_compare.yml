@@ -1,0 +1,15 @@
+METHODS:
+  ARGMAX: True
+  K_MEANS: True
+  KL_K_MEANS: True
+  Mah_K_MEANS: False
+  GMM: True
+  K_MEDIANS: True
+  K_MEDOIDS: True
+  K_MODES: True
+  K_CENTERS: False
+  HSC: False
+  K_DIRS: True
+  K_BETAS: True
+  K_SBETAS: False
+  K_SBETAS_W: True
