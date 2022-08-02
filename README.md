@@ -16,8 +16,10 @@ If you find this code useful for your research, please cite our [paper](https://
 ```
 
 ## Abstract
+<p align="justify">
   We explore clustering the softmax predictions of deep neural networks and introduce a novel probabilistic clustering method, referred to as k-sBetas. In the general context of clustering distributions, the existing methods focused on exploring distortion measures tailored to simplex data, such as the KL divergence, as alternatives to the standard Euclidean distance. We provide a general perspective of clustering distributions, which emphasizes that the statistical models underlying distortion-based methods may not be descriptive enough. Instead, we optimize a mixed-variable objective measuring the conformity of data within each cluster to the introduced sBeta density function, whose parameters are constrained and estimated jointly with binary assignment variables.
 Our versatile formulation approximates a variety of parametric densities for modeling cluster data, and enables to control the cluster-balance bias. This yields competitive performances for efficient unsupervised adjustment of black-box predictions in a variety of scenarios, including one-shot classification and unsupervised domain adaptation in real-time for road segmentation.
+</p>
 <p align="center">
   <img src="./code_illustrations/real_time_UDA_road_seg.PNG" width="450">
 </p>
