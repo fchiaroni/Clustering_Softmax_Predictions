@@ -1,4 +1,4 @@
-# HSC authors code
+# Implementation based on HSC authors code
 
 from __future__ import division
 from __future__ import print_function
@@ -13,86 +13,20 @@ class Multinomial( object ):
     ##################################################################################
 
     @staticmethod
-    def kl( a, b ):
-        return a.kl( b )
-
-    @staticmethod
-    def kl_distance( a, b ):
-        '''
-        notice the difference with KL
-        '''
-        return a.kl_distance( b )
-
-    @staticmethod
-    def hellinger_distance( a, b ):
-        return a.hellinger_distance( b )
-
-    @staticmethod
-    def alphadiv( a, b, alpha ):
-        return a.alphadiv( b, alpha )
-
-    @staticmethod
-    def riemannian_distance( a, b ):
-        return a.riemannian_distance( b )
-
-    @staticmethod
     def hilbert_distance( a, b ):
         return a.hilbert_distance( b )
-
-    @staticmethod
-    def euclidean_distance( a, b ):
-        return a.euclidean_distance( b )
-
-    @staticmethod
-    def cs_divergence( a, b ):
-        return a.cs_divergence( b )
-
-    @staticmethod
-    def l1_distance( a, b ):
-        return a.l1_distance( b )
 
     ################################################################################
     # compute means and centers
     ################################################################################
-
-    @staticmethod
-    def cut( a, b, r ):
-        return a.cut( b, r )
 
     @staticmethod
     def hilbert_cut( a, b, r ):
         return a.hilbert_cut( b, r )
 
-    @staticmethod
-    def riemannian_cut( a, b, r ):
-        return a.riemannian_cut( b, r )
-
     ################################################################################
     # compute means and centers
     ################################################################################
-
-    @staticmethod
-    def mean( distributions, max_itrs=None, verbose=False ):
-        '''
-        right-handed Bregman centroid
-        '''
-        P = np.array( [ _d.p for _d in distributions ] )
-        return Multinomial( P.mean(0) )
-
-    @staticmethod
-    def euclidean_center( distributions, max_itrs=200, tol=1e-4, verbose=False ):
-        '''
-        Euclidean center
-        '''
-        return Multinomial.__center( distributions, Multinomial.euclidean_distance, Multinomial.cut, max_itrs, verbose )
-
-    @staticmethod
-    def kl_center( distributions, max_itrs=200, tol=1e-4, verbose=False ):
-        '''
-        KL min-max center
-        C = argmin_c max_{d} KL( d, c )
-        '''
-        return Multinomial.__center( distributions, Multinomial.kl, Multinomial.cut, max_itrs, verbose )
 
     @staticmethod
     def hilbert_center( distributions, max_itrs=200, tol=1e-4, verbose=False ):
@@ -100,13 +34,6 @@ class Multinomial( object ):
         compute the Hilbert center of distributions
         '''
         return Multinomial.__center( distributions, Multinomial.hilbert_distance, Multinomial.hilbert_cut, max_itrs, verbose )
-
-    @staticmethod
-    def riemannian_center( distributions, max_itrs=200, verbose=False ):
-        '''
-        compute the center of the smallest enclosing ball
-        '''
-        return Multinomial.__center( distributions, Multinomial.riemannian_distance, Multinomial.riemannian_cut, max_itrs, verbose )
 
     @staticmethod
     def __center( distributions, compute_distance, compute_cut, max_itrs, verbose ):
@@ -134,39 +61,14 @@ class Multinomial( object ):
     ##########################################################################################
 
     @staticmethod
-    def riemannian_kcenters( distributions, k, max_itrs=100, max_center_itrs=100, seed=None, plusplus=True, verbose=False ):
-        return Multinomial.__kmeans( distributions, k,
-                                     Multinomial.riemannian_distance,
-                                     Multinomial.riemannian_center,
-                                     max_itrs, max_center_itrs, seed, plusplus, verbose )
-
-    @staticmethod
-    def euclidean_kcenters( distributions, k, max_itrs=100, max_center_itrs=100, seed=None, plusplus=True, verbose=False ):
-        return Multinomial.__kmeans( distributions, k,
-                                     Multinomial.euclidean_distance,
-                                     Multinomial.euclidean_center,
-                                     max_itrs, max_center_itrs, seed, plusplus, verbose )
-
-    @staticmethod
-    def kl_kcenters( distributions, k, max_itrs=100, max_center_itrs=100, seed=None, plusplus=True, verbose=False ):
-        return Multinomial.__kmeans( distributions, k, 
-                                     Multinomial.kl_distance,
-                                     Multinomial.kl_center,
-                                     max_itrs, max_center_itrs, seed, plusplus, verbose )
-
-    @staticmethod
-    def hilbert_kcenters( distributions, k, max_itrs=100, max_center_itrs=100, seed=None, plusplus=True, verbose=False ):
+    def hilbert_kcenters( distributions, k, max_itrs=100, max_center_itrs=100, 
+                          seed=None, init_strategy="kmeans_plusplus_init", 
+                          verbose=False ):
         return Multinomial.__kmeans( distributions, k, 
                                      Multinomial.hilbert_distance,
                                      Multinomial.hilbert_center,
-                                     max_itrs, max_center_itrs, seed, plusplus, verbose )
-
-    @staticmethod
-    def kl_kmeans( distributions, k, max_itrs=100, max_center_itrs=100, seed=None, plusplus=True, verbose=False ):
-        return Multinomial.__kmeans( distributions, k, 
-                                     Multinomial.kl_distance,
-                                     Multinomial.mean,
-                                     max_itrs, max_center_itrs, seed, plusplus, verbose )
+                                     max_itrs, max_center_itrs, seed, 
+                                     init_strategy, verbose )
 
     @staticmethod
     def __kmeansplusplus( distributions, k, compute_distance ):
@@ -207,7 +109,7 @@ class Multinomial( object ):
         return [Multinomial(p) for p in centers]
 
     @staticmethod
-    def __kmeans( distributions, k, compute_distance, compute_center, max_itrs, max_center_itrs, seed, plusplus, verbose ):
+    def __kmeans( distributions, k, compute_distance, compute_center, max_itrs, max_center_itrs, seed, init_strategy, verbose ):
         '''
         general kmeans clustering
 
@@ -218,7 +120,7 @@ class Multinomial( object ):
         max_itrs         -- maximum number of iterations
         max_center_itrs  -- maximum number of iterations for center computation
         seed             -- random seed
-        plusplus         -- whether to use the kmeans++ seeding
+        init_strategy    -- whether to use the kmeans++ seeding
         verbose          -- verbose or not
 
         return the clustering scheme, e.g.
@@ -226,9 +128,9 @@ class Multinomial( object ):
         '''
         
         if seed is not None: np.random.seed( seed )
-        if plusplus==1.:
+        if init_strategy == "kmeans_plusplus_init":
             centers = Multinomial.__kmeansplusplus( distributions, k, compute_distance )
-        elif plusplus==2.:
+        elif init_strategy == "vertices_init":
             centers = Multinomial.__vertices_init( distributions, k, compute_distance )
         else:
             centers = [ distributions[i] for i in np.random.randint( len(distributions), size=k ) ]
@@ -321,19 +223,6 @@ class Multinomial( object ):
     def __str__( self ):
         return ' '.join( [ '%.4f' % f for f in self.p ] )
 
-    def cut( self, other, r ):
-        '''
-        Euclidean cut
-
-        On the line connecting self and other,
-        find the point A so that 
-        HD( self, A ) = r HD( self, other )
-        '''
-        assert( r >= 0 )
-        assert( r <= 1 )
-
-        return Multinomial( (1-r) * self.p + r * other.p )
-
     def hilbert_cut( self, other, r ):
         '''
         On the line connecting self and other,
@@ -381,96 +270,4 @@ class Multinomial( object ):
         if np.isclose( t0, 0 ) or np.isclose( t1, 1 ): return np.inf
 
         return np.abs( np.log( 1-1/t0 ) - np.log( 1-1/t1 ) )
-
-    def riemannian_cut( self, other, r ):
-        '''
-        on the geodesic connecting self and other
-        find the point A so that
-        D( self, A ) = r D ( self, other )
-
-        draw the triangles to understand this function
-        '''
-        assert( r >= 0 )
-        assert( r <= 1 )
-
-        if np.isclose( r, 0 ): return Multinomial( self.p )
-        if np.isclose( r, 1 ): return Multinomial( other.p )
-        if np.allclose( self.p, other.p ): return Multinomial( self.p )
-
-        # two points A, B on the sphere
-        A = np.sqrt( self.p )
-        B = np.sqrt( other.p )
-        M = .5 * ( A + B )
-        direc = (B-A)/np.linalg.norm(B-A) # unit vector from A to B
-
-        alpha = np.arccos( (A*B).sum() ) * (r-0.5)
-        p = M + np.linalg.norm( M ) * np.tan( alpha ) * direc
-        p /= np.linalg.norm( p )
-
-        return Multinomial( p**2 )
-
-    def riemannian_distance( self, other ):
-        '''
-        Riemannian geodesic distance
-        '''
-        cos = np.sqrt( self.p * other.p ).sum()
-        cos = min( cos, 1 )
-        cos = max( cos, -1 )
-        return 2 * np.arccos( cos )
-
-    def kl( self, other ):
-        '''
-        KL divergence
-        '''
-        _dist = ( self.p * (np.log(self.p+self.eps) - np.log(other.p+self.eps)) ).sum()
-        return max( _dist, 0 )
-
-    def kl_distance( self, other ):
-        '''
-        square root of KL
-        '''
-        return np.sqrt( self.kl( other ) )
-
-    def hellinger_distance( self, other ):
-        '''
-        Hellinger distance
-        '''
-        hell2 = 1 - np.sqrt( self.p * other.p ).sum()
-        return np.sqrt( max( hell2, 0 ) )
-
-    def alphadiv( self, other, alpha ):
-        '''
-        alpha divergence
-        '''
-        if np.isclose( alpha, 0 ):
-            return other.kl( self )
-
-        elif np.isclose( alpha, 1 ):
-            return self.kl( other )
-
-        else:
-            d = ( np.power( self.p, alpha ) * np.power( other.p, 1-alpha ) ).sum()
-            _dist = (1-d) / ( alpha * (1-alpha) )
-            return max( _dist, 0 )
-
-    def euclidean_distance( self, other ):
-        '''
-        Euclidean distance
-        '''
-        return np.linalg.norm( self.p - other.p )
-
-    def cs_divergence( self, other ):
-        '''
-        Cauchy Schwarz divergence
-        '''
-        a = self.p / np.linalg.norm( self.p )
-        b = other.p / np.linalg.norm( other.p )
-        _dist = - np.log( ( a * b ).sum() + self.eps )
-        return max( _dist, 0 )
-
-    def l1_distance( self, other ):
-        '''
-        total variance
-        '''
-        return np.abs( self.p - other.p ).sum()
 

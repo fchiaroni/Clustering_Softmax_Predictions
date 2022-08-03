@@ -15,7 +15,7 @@ from sklearn_extra.cluster import KMedoids
 from clustering_methods.kmedoids import KMedoids as KMed
 from clustering_methods import kmodes as kmodes_lib
 from clustering_methods import kcenters_eucl as kcenters_eucl_lib
-from clustering_methods.Multinomial import Multinomial # HSC Authors library
+from clustering_methods.k_hsc import Multinomial # HSC Authors library
 from clustering_methods import k_dirs as k_dirs_lib
 #from clustering_methods import k_sbetas_GPU as k_sbetas_lib
 from clustering_methods import k_sbetas as k_sbetas_lib
@@ -372,21 +372,15 @@ def main():
             
             elif method_selection[approach_name] == True and approach_name=="HSC":    
                 ## HSC
-                if clustering_init == "kmeans_plusplus_init":
-                    hilbert_strat_init = 1.
-                elif clustering_init == "vertices_init":
-                    hilbert_strat_init = 2.
-                else:
-                    hilbert_strat_init = 0.
                 distributions = [ Multinomial(p) for p in softmax_predictions ]
                 magic_number = 2020 # chosen arbitrarily
                 start_time = time.time()
                 clustering_labels, Hilbert_kcenter_dists, Hilbert_centroids = Multinomial.hilbert_kcenters(distributions, 
-                                                                                                                          number_of_classes, 
-                                                                                                                          seed=magic_number,
-                                                                                                                          max_itrs = clustering_iters,
-                                                                                                                          max_center_itrs=max_center_iters,
-                                                                                                                          plusplus = hilbert_strat_init)
+                                                                                                           number_of_classes, 
+                                                                                                           seed=magic_number,
+                                                                                                           max_itrs = clustering_iters,
+                                                                                                           max_center_itrs=max_center_iters,
+                                                                                                           init_strategy = clustering_init)
                 total_time = time.time()-start_time   
                 print(approach_name, "comp time:", np.round(total_time, 4))  
                 
@@ -482,13 +476,12 @@ def main():
                     pred_labels = reordered_labels 
                 ##                
 
-                ## Evaluation                
+                # Evaluation                
                 all_scores[method_id]["Acc"][run] = accuracy_score(np.asarray(gt_labels, dtype = float), 
                                                                         np.asarray(pred_labels, dtype = float))
                 all_scores[method_id]["NMI"][run] = sk_metrics.normalized_mutual_info_score(np.asarray(gt_labels, dtype = float), 
                                                                                               np.asarray(pred_labels, dtype = float))
-                all_scores[method_id]["mean IoU"][run] = metrics_lib.compute_mean_IoU(number_of_classes, pred_labels, gt_labels)                     
-                ##
+                all_scores[method_id]["mean IoU"][run] = metrics_lib.compute_mean_IoU(number_of_classes, pred_labels, gt_labels)
             
     ## Display scores using latex format
     print("")
