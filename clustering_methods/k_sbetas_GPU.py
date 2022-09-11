@@ -11,7 +11,7 @@ import time
 import torch
 import sbeta_mle
 import os
-
+import argparse
 
 def from_list_of_torch_to_torch(lst):
     return torch.stack(lst)
@@ -301,34 +301,63 @@ def pred_only(torch_x_pred,
     return torch_estim_labels, torch_estim_probs
 
 
+def get_arguments():
+    """
+    Parse input arguments
+    """
+    parser = argparse.ArgumentParser(description="Code for clustering probability simplex points")
+    
+    parser.add_argument('--dataset', type=str, default='SVHN_to_MNIST',
+                        choices=['SVHN_to_MNIST', 'VISDA_C', 'iVISDA_Cs', 'Simu', 'iSimus'])
+    
+    parser.add_argument('--device_name', type=str, default='cuda:0',
+                        choices=['cpu', 'cuda:0', 'cuda:1'])
+    
+    parser.add_argument('--clustering_iters', type=int, default=25,
+                        help="Clustering iterations.")
+    
+    parser.add_argument('--unbiased', type=bool, default=True,
+                        help="Enable unbiased formulation. " +
+                             "We recommend to set True on Large-Scale imbalanced datasets.")
+
+    parser.add_argument('--centroids_init', type=str, default='vertices_init', 
+                        choices=['kmeans_plusplus_init', 'vertices_init'],
+                        help="Centroids (or parameters) initialization strategy. " +
+                             "Use vertices_init only on closet-set challenges.")
+
+    parser.add_argument('--delta', type=float, default=0.15,
+                        help="delta value")
+
+    return parser.parse_args()
+
 def main():
-    print(torch.__version__)
     print("k-sBetas clustering algorithm")
-    delta = 0.15
+    args = get_arguments()
     # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"  # specify which GPU(s) to be used
-    #device_name = 'cpu'
-    device_name = 'cuda:0'
 
     ## Load the target dataset (points must be defined on the probability simplex domain)
-    dataset_name = "SVHN_to_MNIST"
-    print("Dataset: ", dataset_name)
-    if (dataset_name == 'SVHN_to_MNIST'):
+    print("Dataset: ", args.dataset)
+    if (args.dataset == 'SVHN_to_MNIST'):
         # SVHN -> MNIST softmax predictions
         GT_labels_path = "../softmax_preds_datasets/SVHN_to_MNIST/target_gt_labels.txt"
         softmax_preds_path = "../softmax_preds_datasets/SVHN_to_MNIST/target_softmax_predictions_ep30.txt"
-    if (dataset_name == 'VISDA_C'):
-        # VISDA-C softmax predictions (pre-trained source model preds)
+    if (args.dataset == 'VISDA_C'):
+        # VISDA-C softmax predictions
         GT_labels_path = "../softmax_preds_datasets/VISDA_C/target_gt_labels.txt"
         softmax_preds_path = "../softmax_preds_datasets/VISDA_C/target_softmax_predictions.txt"
     gt_labels = np.loadtxt(GT_labels_path)
     init_all_softmax_predictions = np.loadtxt(softmax_preds_path)
     ##
 
-    cluster_number = len(init_all_softmax_predictions[0])
+    class_number = int(np.max(gt_labels)+1)
+    print(init_all_softmax_predictions.shape[0])
+    print(init_all_softmax_predictions.shape[1])
+    if class_number != init_all_softmax_predictions.shape[1]:
+        raise Exception("The number of present classes must be equal to softmax preds dimension! (closed-set setting)")
 
     ## Conversions npy to pytorch
-    torch_device = torch.device(device_name)
+    torch_device = torch.device(args.device_name)
     torch_x_pred = from_numpy_to_torch(init_all_softmax_predictions, torch_device)
     ##
 
@@ -339,21 +368,21 @@ def main():
     start.record()
     #
     torch_sBeta_params, torch_pred_labels, _, torch_estim_weights = clustering(torch_x_pred,
-                                                                               n_clusters=cluster_number,
-                                                                               n_dim=cluster_number,
-                                                                               num_iters=25,
-                                                                               weighted_clustering=True,
-                                                                               delta=delta,
+                                                                               n_clusters=class_number,
+                                                                               n_dim=class_number,
+                                                                               num_iters=args.clustering_iters,
+                                                                               weighted_clustering=args.unbiased,
+                                                                               delta=args.delta,
                                                                                estim_method="MoM",
                                                                                lambda_constr=165.,
-                                                                               device_name=device_name,
-                                                                               init_strategy="vertices_init")
+                                                                               device_name=args.device_name,
+                                                                               init_strategy=args.centroids_init)
     #
     end.record()
     torch.cuda.synchronize()
     cuda_clust_total_time = (start.elapsed_time(end)) / 1000
     cpu_clust_total_time = time.time() - clust_start_time
-    if device_name == 'cpu':
+    if args.device_name == 'cpu':
         print("CPU clustering comp time:", np.round(cpu_clust_total_time, 4))
     else:
         print("GPU clustering comp time:", np.round(cuda_clust_total_time, 4))
@@ -368,17 +397,17 @@ def main():
     torch_pred_labels, _ = pred_only(torch_x_pred,
                                      torch_sBeta_params,
                                      torch_estim_weights,
-                                     n_clusters=cluster_number,
-                                     n_dim=cluster_number,
-                                     weighted_clustering=True,
-                                     delta=delta,
-                                     device_name=device_name)
+                                     n_clusters=class_number,
+                                     n_dim=class_number,
+                                     weighted_clustering=args.unbiased,
+                                     delta=args.delta,
+                                     device_name=args.device_name)
     #
     end.record()
     torch.cuda.synchronize()
     cuda_inf_total_time = (start.elapsed_time(end)) / 1000
     cpu_inf_total_time = time.time() - inf_start_time
-    if device_name == 'cpu':
+    if args.device_name == 'cpu':
         print("CPU inference comp time:", np.round(cpu_inf_total_time, 4))
     else:
         print("GPU inference comp time:", np.round(cuda_inf_total_time, 4))
@@ -390,7 +419,7 @@ def main():
     ##
 
     centroids = []
-    for cl in range(0, cluster_number):
+    for cl in range(0, class_number):
         centroids.append([row[2] for row in sBeta_params[cl]])
     centroids = np.asarray(centroids)
 

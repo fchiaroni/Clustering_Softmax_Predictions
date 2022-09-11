@@ -3,7 +3,6 @@ import numpy as np
 from sklearn import metrics
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
-import matplotlib.pyplot as plt
 import metrics as metrics_lib
 
 

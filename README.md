@@ -32,6 +32,12 @@ Our versatile formulation approximates a variety of parametric densities for mod
 * Pytorch 1.10.0 (for GPU-based k-sBetas only)
 * CUDA 11.4 (for GPU-based k-sBetas only)
 
+You can install all the pre-requisites using 
+```bash
+$ cd <root_dir>
+$ pip install -r requirements.txt
+```
+
 ### Datasets
 The comparisons are performed on the following datasets:
 - Artificial datasets on the probability simplex domain
@@ -57,15 +63,36 @@ The script compare_softmax_preds_clustering.py compares the following clustering
 - k-sBetas (proposed)
 
 ### Running the code
-Compare clustering approaches by executing:
+You can select the methods to compare by setting the config file [`./configs/select_methods_to_compare.py`](./configs/select_methods_to_compare.yml) .
+
+Compare clustering approaches on SVHN to MNIST dataset:
 ```bash
 $ cd <root_dir>
-$ python compare_softmax_preds_clustering.py --dataset SVHN_to_MNIST % Comparison on SVHN to MNIST dataset
-$ python compare_softmax_preds_clustering.py --dataset VISDA_C % Comparison on VISDA-C dataset
-$ python compare_softmax_preds_clustering.py --dataset iVISDA_Cs % Comparison on highly imbalanced iVISDA-Cs datasets
+$ python compare_softmax_preds_clustering.py --dataset SVHN_to_MNIST
 ```
 
-### Recommandations
-- The most appropriate value for the "delta" parameter of k-sBetas may change depending on the datasets distributions. We recommand to select delta using a validation set.
+Compare clustering approaches on VISDA-C dataset:
+```bash
+$ cd <root_dir>
+$ python compare_softmax_preds_clustering.py --dataset VISDA_C
+```
+
+Compare clustering approaches on highly imbalanced iVISDA-Cs datasets:
+```bash
+$ cd <root_dir>
+$ python compare_softmax_preds_clustering.py --dataset iVISDA_Cs
+```
+
+Run only k-sBetas (GPU-based):
+```bash
+$ cd <root_dir>/clustering_methods
+$ python k_sbetas_GPU.py --dataset SVHN_to_MNIST
+$ python k_sbetas_GPU.py --dataset VISDA_C
+$ python k_sbetas_GPU.py --dataset iVISDA_Cs
+```
+
+
+### Recommendations
+- The most appropriate value for the "delta" parameter of k-sBetas may change depending on the datasets distributions. We recommend to select delta using a validation set.
 - On small-scale datasets, the biased formulation for k-sBetas could be more stable.
 - On large-scale imbalanced datasets, the unbiased formulation provides better results.
