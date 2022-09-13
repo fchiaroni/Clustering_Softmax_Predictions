@@ -26,7 +26,7 @@ Our versatile formulation approximates a variety of parametric densities for mod
 
 ### Pre-requisites
 * Python 3.9.4
-* numpy 1.20.1
+* numpy 1.22.0
 * scikit-learn 0.24.1
 * scikit-learn-extra 0.2.0 (for k-medoids only)
 * Pytorch 1.11.0 (for GPU-based k-sBetas only)
