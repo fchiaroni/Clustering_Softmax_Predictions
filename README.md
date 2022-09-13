@@ -91,6 +91,32 @@ $ python k_sbetas_GPU.py --dataset VISDA_C
 $ python k_sbetas_GPU.py --dataset iVISDA_Cs
 ```
 
+### Results
+
+
+|   (Acc)    | SVHN to MNIST | VISDA-C | iVISDA-Cs |
+|---------------|------------|---------------|-----------|
+|argmax | 69.8 | 53.1 | 44.2 |
+|K-means | 68.9 | 47.9 | 39.3 |
+|KL K-means | 75.5 | 51.2 | 41.8 |
+|GMM | 67.6 | 45.7 | 37.0 |
+|K-medians | 68.8 | 40.0 | 36.9 |
+|K-medoids | 71.3 | 46.8 | 40.4 |
+|K-modes | 71.3 | 31.1 | 29.9 |
+|K-Betas | 41.2 | 24.9 | 27.2 |
+| **k-sBetas** (proposed) | **76.5** | **56.0** | **46.8** |
+
+|   (IoU)    | SVHN to MNIST | VISDA-C | iVISDA-Cs |
+|---------------|------------|---------------|-----------|
+|argmax | 54.3 | 32.5 | 22.7 |
+|K-means | 55.7 | 34.6 | 24.2 |
+|KL K-means | 62.1 | 37.3 | 24.9 |
+|GMM | 55.0 | 30.1 | 20.4 |
+|K-medians | 56.0 | 29.6 | 22.4 |
+|K-medoids | 57.5 | 33.7 | 22.5 |
+|K-modes | 56.2 | 24.3 | 18.4 |
+|K-Betas | 25.4 | 14.0 | 14.1 |
+| **k-sBetas** (proposed) | **63.6** | **39.0** | **26.9** |
 
 ### Recommendations
 - The most appropriate value for the "delta" parameter of k-sBetas may change depending on the datasets distributions. We recommend to select delta using a validation set.

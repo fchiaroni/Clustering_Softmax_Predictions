@@ -9,7 +9,7 @@ METHODS:
   K_MODES: True
   K_CENTERS: False
   HSC: False
-  K_DIRS: True
+  K_DIRS: False
   K_BETAS: True
   K_SBETAS: False
   K_SBETAS_W: True
