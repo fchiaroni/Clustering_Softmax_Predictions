@@ -29,8 +29,8 @@ Our versatile formulation approximates a variety of parametric densities for mod
 * numpy 1.20.1
 * scikit-learn 0.24.1
 * scikit-learn-extra 0.2.0 (for k-medoids only)
-* Pytorch 1.10.0 (for GPU-based k-sBetas only)
-* CUDA 11.4 (for GPU-based k-sBetas only)
+* Pytorch 1.11.0 (for GPU-based k-sBetas only)
+* CUDA 11.3 (for GPU-based k-sBetas only)
 
 You can install all the pre-requisites using 
 ```bash
@@ -93,9 +93,12 @@ $ python k_sbetas_GPU.py --dataset iVISDA_Cs
 
 ### Results
 
+<table>
+<tr><th>Table 1: Accuracy scores</th><th>Table 2: mean IoU scores</th></tr>
+<tr><td>
 
 |   (Acc)    | SVHN to MNIST | VISDA-C | iVISDA-Cs |
-|---------------|------------|---------------|-----------|
+|------------|:-------------:|:-------:|:---------:|
 |argmax | 69.8 | 53.1 | 44.2 |
 |K-means | 68.9 | 47.9 | 39.3 |
 |KL K-means | 75.5 | 51.2 | 41.8 |
@@ -104,10 +107,12 @@ $ python k_sbetas_GPU.py --dataset iVISDA_Cs
 |K-medoids | 71.3 | 46.8 | 40.4 |
 |K-modes | 71.3 | 31.1 | 29.9 |
 |K-Betas | 41.2 | 24.9 | 27.2 |
-| **k-sBetas** (proposed) | **76.5** | **56.0** | **46.8** |
+| **k-sBetas** <br> (proposed) | **76.5** | **56.0** | **46.8** |
 
-|   (IoU)    | SVHN to MNIST | VISDA-C | iVISDA-Cs |
-|---------------|------------|---------------|-----------|
+</td><td>
+
+|   (mIoU)    | SVHN to MNIST | VISDA-C | iVISDA-Cs |
+|------------|:-------------:|:-------:|:---------:|
 |argmax | 54.3 | 32.5 | 22.7 |
 |K-means | 55.7 | 34.6 | 24.2 |
 |KL K-means | 62.1 | 37.3 | 24.9 |
@@ -116,7 +121,9 @@ $ python k_sbetas_GPU.py --dataset iVISDA_Cs
 |K-medoids | 57.5 | 33.7 | 22.5 |
 |K-modes | 56.2 | 24.3 | 18.4 |
 |K-Betas | 25.4 | 14.0 | 14.1 |
-| **k-sBetas** (proposed) | **63.6** | **39.0** | **26.9** |
+| **k-sBetas** <br> (proposed) | **63.6** | **39.0** | **26.9** |
+
+</td></tr> </table>
 
 ### Recommendations
 - The most appropriate value for the "delta" parameter of k-sBetas may change depending on the datasets distributions. We recommend to select delta using a validation set.
