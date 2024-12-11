@@ -7,12 +7,16 @@
 
 If you find this code useful for your research, please cite our [paper](https://arxiv.org/pdf/2208.00287.pdf):
 ```
-@article{ch2022sc,
-  title={Simplex Clustering via sBeta with Applications to Online Adjustments of Black-Box Predictions},
-  author={Chiaroni, Florent and Boudiaf, Malik and Mitiche, Amar and Ben Ayed, Ismail},
-  journal={arXiv preprint arXiv:2208.00287},
-  year={2022}
-}
+@ARTICLE{10571603,
+  author={Chiaroni, Florent and Boudiaf, Malik and Mitiche, Amar and Ayed, Ismail Ben},
+  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
+  title={Simplex Clustering via sBeta With Applications to Online Adjustment of Black-Box Predictions}, 
+  year={2024},
+  volume={46},
+  number={12},
+  pages={9123-9138},
+  keywords={Predictive models;Adaptation models;Closed box;Standards;Distortion measurement;Computational modeling;Histograms;Probability simplex clustering;softmax predictions;deep black-box models;pre-trained;unsupervised adaptation},
+  doi={10.1109/TPAMI.2024.3418776}}
 ```
 
 ## Abstract
