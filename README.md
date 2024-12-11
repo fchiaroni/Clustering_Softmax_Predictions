@@ -5,7 +5,7 @@
 ## Paper
 ### [**Simplex Clustering via sBeta with Applications to Online Adjustment of Black-Box Predictions**](https://arxiv.org/pdf/2208.00287.pdf)
 
-If you find this code useful for your research, please cite our [paper](https://arxiv.org/pdf/2208.00287.pdf):
+If you find this code useful for your research, please cite our [paper](https://arxiv.org/pdf/2208.00287.pdf) (published at IEEE TPAMI 2024):
 ```
 @ARTICLE{10571603,
   author={Chiaroni, Florent and Boudiaf, Malik and Mitiche, Amar and Ayed, Ismail Ben},
